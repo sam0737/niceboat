@@ -1,0 +1,10 @@
+*.pyc
+*.sw*
+__pycache__
+/pyenv
+
+/run
+/supervisord_config
+
+config.py
+user.list
