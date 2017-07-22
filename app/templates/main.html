@@ -12,7 +12,7 @@
 
   <div id="param_gcm" class="hidden">
   <h1>连线参数 (GCM)</h1>
-  <p>你的专属隧道是创建于: {{ ss_links.aes_256_gcm.time | strftime }}。有效期约30天。</p>
+  <p>你的专属隧道是创建于: {{ ss_links.aes_256_gcm.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
   <p>请选用以下其中一种方法设定你的Shadowsocks软件 (三种是一样的)</p>
   <div class="row">
     <div class="col-md-4">
@@ -38,7 +38,7 @@
   <div id="param_cfb" class="hidden">
   <p><a id="show_gcm" href="javascript:$('#param_gcm').removeClass('hidden')">显示GCM参数</a> - 目前为止iOS未有App支持AES-256-GCM加密制式，所以默认隐藏。GCM(AEAD)制式有更显着的隐身功效。</p>
   <h1>连线参数 (CFB)</h1>
-  <p>你的专属隧道是创建于: {{ ss_links.aes_256_cfb.time | strftime }}。有效期约30天。</p>
+  <p>你的专属隧道是创建于: {{ ss_links.aes_256_cfb.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
   <p>请选用以下其中一种方法设定你的Shadowsocks软件 (三种是一样的)</p>
   <div class="row">
     <div class="col-md-4">
@@ -105,7 +105,7 @@
 
   <h1>疑难排解</h1>
   <ul>
-    <li>你的专属隧道有效期约30天，之后会失效。到时候重新登录再配置一次。</li>
+    <li>你的专属隧道有效期约{{ Config.exp_day }}天，之后会失效。到时候请重新登录再配置一次。</li>
     <li>部份软件提供<strong>全局(Global)</strong>或<strong>只限黑名单(PAC)/中国地区自动侦察</strong>两种模式选择，因为名单更新未必及时，如遇问题时请切换到Global模式再试。</li>
     <li>速度变慢或无反应时…<br><i>点击下面两个按钮前先停用Shadowsocks</i></li>
     <ul>
