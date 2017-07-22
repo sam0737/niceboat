@@ -113,6 +113,9 @@
       <li>还是不行时，则<form style="display: inline" action="{{ url_for('recreate') }}" method="POST"><input name="_csrf_token" type="hidden" value="{{ csrf_token() }}"><input type="submit" class="btn btn-default btn-sm" value="重建新隧道 (换端口/密码)"></form>，并重新配置。</li>
     </ul>
   </ul>
+
+  <h1>使用规定和安全注意事项</h1>
+  {% include "caution.html" %}
 </div>
 
 {% endblock %}

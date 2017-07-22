@@ -1,4 +1,6 @@
 from flask import Flask, session, redirect, url_for, render_template, request, abort, send_file
+from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
+from datetime import timedelta
 import os
 import random
 import time
@@ -20,13 +22,33 @@ handler.setLevel(logging.DEBUG)
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SECRET_KEY'] = Config.secret
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'index'
 
 scm = SupervisorConfigManager( os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/supervisord_config' )
 
 class UnauthorizedException(Exception):
     pass
+
+class User(UserMixin):
+    def __init__(self, user_profile):
+        self.user_profile = user_profile
+
+    @property
+    def username(self):
+        return self.user_profile.get('username', None)
+
+    def get_id(self):
+        return self.user_profile.get('username', None)
+
+@login_manager.user_loader
+def load_user(user_id):
+    user_profile = get_user_profile({'username': user_id})
+    return None if user_profile is None else User(user_profile)
 
 @app.before_request
 def csrf_protect():
@@ -42,15 +64,7 @@ def generate_csrf_token():
     return session['_csrf_token']
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
-
-def assert_valid_session():
-    if 'username' not in session:
-        raise UnauthorizedException
-    if 'time' not in session:
-        raise UnauthorizedException
-    if time.time() - int(session['time']) > 60 * 5:
-        raise UnauthorizedException
-    session['time'] = time.time()
+app.jinja_env.globals['Config'] = Config
 
 @app.errorhandler(UnauthorizedException)
 def handle_unauthorized_exception(ex):
@@ -77,33 +91,36 @@ def index():
     auth_failed = False
     if request.method == "POST":
         if authenticate(request.form['username'], request.form['password']):
-            session.clear()
-            session['username'] = request.form['username']
-            session['time'] = time.time()
-            return redirect(url_for('main'))
+            user = load_user(request.form['username'])
+            if user is not None:
+                login_user(user)
+                return redirect(url_for('main'))
         auth_failed = True
 
-    session.pop('username', None)
-    m = dict()
-    return render_template('login.html', auth_failed=auth_failed, m=m)
+    return render_template('login.html', auth_failed=auth_failed)
 
 @app.route('/welcome')
+@login_required
 def main():
-    assert_valid_session()
-    ss_links = scm.create(session['username'])
+    ss_links = scm.create(current_user.username)
     return render_template('main.html', ss_links=ss_links)
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.route('/restart', methods=['POST'])
+@login_required
 def restart():
-    assert_valid_session()
-    scm.restart(session['username'])
+    scm.restart(current_user.username)
     return render_template('status.html', title="重启", message="穿越隧道已成功重启")
 
 @app.route('/recreate', methods=['POST'])
+@login_required
 def recreate():
-    assert_valid_session()
-    scm.remove(session['username'])
-    scm.create(session['username'])
+    scm.remove(current_user.username)
+    scm.create(current_user.username)
     return render_template('status.html', title="重建", message="穿越隧道已重建，请返回上一页获取参数。")
 
 @app.route('/password/reset', methods=['GET', 'POST'])
@@ -117,7 +134,7 @@ def password_reset():
         if timed_signature.validate(
             (user_profile['username'] + ':' + (user_profile['crypt'] or '')).encode('utf-8'),
             reset_key,
-            size = 600):
+            size = 10):
             check = True
     if not check:
         return render_template('password_forget.html', reset_key_failed=True)
@@ -141,7 +158,18 @@ def password_reset():
             update_user_profile(username, {'password': password})
             return render_template('status.html', title="重置密码", message="重置密码完成，现在可以返回首页并登录。")
 
-    return render_template('password_reset.html', user_profile=user_profile, Config=Config, password_complexity_failed=password_complexity_failed)
+    return render_template('password_reset.html', user_profile=user_profile, password_complexity_failed=password_complexity_failed)
+
+def try_send_password_reset_letter(email):
+    user_profile = get_user_profile({'email': email})
+    if user_profile:
+        app.logger.info('password forget request: <%s> ok' % email)
+        reset_key = timed_signature.sign(
+            (user_profile['username'] + ':' + (user_profile['crypt'] or '')).encode('utf-8')
+        )
+        sendmail([user_profile['email']], 'Niceboat: 密码重置', render_template('password_reset_letter.txt', user_profile=user_profile, reset_key=reset_key))
+    else:
+        app.logger.info('password forget request: <%s> not found' % email[0:80])
 
 @app.route('/password/forget', methods=['GET', 'POST'])
 def password_forget():
@@ -151,15 +179,9 @@ def password_forget():
         captcha_input = request.form['captcha'].upper().encode('utf-8')
         captcha_sig = session.pop('captcha_pf', '')
         if timed_signature.validate(captcha_input, captcha_sig):
-            user_profile = get_user_profile({'email': request.form['email'].strip()})
-            if user_profile:
-                app.logger.info('password forget request: <%s> ok' % request.form['email'].strip())
-                reset_key = timed_signature.sign(
-                    (user_profile['username'] + ':' + (user_profile['crypt'] or '')).encode('utf-8')
-                )
-                sendmail([user_profile['email']], 'Niceboat: 密码重置', render_template('password_reset_letter.txt', Config=Config, user_profile=user_profile, reset_key=reset_key))
-            else:
-                app.logger.info('password forget request: <%s> not found' % (request.form['email'].strip())[0:80])
+            for email in request.form['email'].split(','):
+                if len(email.strip()) > 0:
+                    try_send_password_reset_letter(email.strip())
             return render_template('status.html', title='重置密码', message='如果你是有穿越权，系统已将重置密码的连结发到你的电子邮箱，请注意查收。')
         else:
             captcha_failed = True

@@ -13,7 +13,7 @@ class SupervisorConfigManager(object):
     def __init__(self, config_path):
         self.config_path = config_path
         pass
-                
+
     @staticmethod
     def _random_string(length):
         pool = string.ascii_letters + string.digits
@@ -23,7 +23,7 @@ class SupervisorConfigManager(object):
     @staticmethod
     def _hash_username(username):
         return '%s_%s' % (
-            re.sub('[^A-Za-z0-9_-]','@',username), 
+            re.sub('[^A-Za-z0-9_-]','@',username),
             hashlib.sha256(username.encode('utf-8')).hexdigest()
         )
 
@@ -38,18 +38,20 @@ class SupervisorConfigManager(object):
             passphrase = passphrase[2::1]
             encryption = 'aes-256-gcm'
         return {
-            'safe_username': m.group(1), 
+            'safe_username': m.group(1),
             'encryption': encryption,
-            'passphrase': passphrase, 
-            'port': int(m.group(3)), 
+            'passphrase': passphrase,
+            'port': int(m.group(3)),
             'time': int(m.group(4))
         }
-    
+
     def _add_link(self, spec):
         host = Config.host
         # [(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
         spec['host'] = host
-        spec['url'] = 'ss://' + base64.b64encode(('%s:%s@%s:%s' % (spec['encryption'], spec['passphrase'], host, spec['port'])).encode('utf-8')).decode('utf-8')
+        spec['url'] = 'ss://' + base64.b64encode(('%s:%s@%s:%s' %
+            (spec['encryption'], spec['passphrase'], host, spec['port'])
+            ).encode('utf-8')).decode('utf-8')
         return spec
 
     def _find_exists(self, username):
@@ -104,7 +106,7 @@ autorestart=true
 
         os.chmod(fullpath, 0o600)
         return self._add_link(spec)
-        
+
     def restart(self, username):
         subprocess.check_call(['supervisorctl', 'reread'])
         subprocess.check_call(['supervisorctl', 'restart', self._hash_username(username)])
@@ -114,7 +116,7 @@ autorestart=true
         for filename in self._find_exists(username):
             os.remove(self.config_path + '/' + filename)
             removed = True
-        if removed: 
+        if removed:
             self._update()
 
     def expire(self):
