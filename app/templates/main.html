@@ -101,6 +101,18 @@
         <li>在软件中启用隧道 (第一次使用要再确认增加VPN配置)，即可穿越上网。</li>
       </ul>
     </div>
+    <div class="col-md-6">
+      <h2>Linux (Ubuntu)</h2>
+      <pre>sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev
+sudo apt-get update
+sudo apt install shadowsocks-libev
+
+man ss-local</pre>
+      <ul>
+        <li>其他版本的安装方法请看 https://github.com/shadowsocks/shadowsocks-libev</li>
+        <li>运行ss-local后还需要配置浏览器使用Sock5 Proxy。This is left as an exercise to the reader.</li>
+      </ul>
+    </div>
   </div>
 
   <h1>疑难排解</h1>
@@ -127,7 +139,7 @@ new QRCode("qrcode_cfb", {width: 128, height: 128}).makeCode({{ ss_links.aes_256
 
 $(function() {
     var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (iOS) { 
+    if (iOS) {
         $('#param_cfb').removeClass('hidden');
     } else {
         $('#param_gcm').removeClass('hidden');
