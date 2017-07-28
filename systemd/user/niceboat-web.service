@@ -1,0 +1,15 @@
+[Unit]
+Description=niceboat web
+
+[Service]
+ExecStart=/ROOT_DIR/niceboat/pyenv/bin/uwsgi --ini /ROOT_DIR/niceboat/uwsgi.ini
+WorkingDirectory=/ROOT_DIR/niceboat
+Restart=always
+RestartSec=3
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
