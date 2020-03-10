@@ -1,4 +1,4 @@
-# Shadowsocks多用户自助管理系统 
+# V2Ray/Shadowsocks多用户自助管理系统 
 
 一个方便用户自助管理V2Ray和Shadowsocks tunnel的Python webapp
 
@@ -8,7 +8,7 @@ A simple python webapp for user to self-manage their Shadowsocks tunnel
 
 ## Installation
 
-执行以下指令
+Run the following commands
 
 ```
 # Install system packages
