@@ -1,41 +1,46 @@
 # Shadowsocks多用户自助管理系统 
 
-一个方便用户自助管理Shadowsocks tunnel的Python webapp
+一个方便用户自助管理V2Ray和Shadowsocks tunnel的Python webapp
 
-# Shadowsocks Multiuser Management System
+# V2Ray/Shadowsocks Multiuser Management System
 
 A simple python webapp for user to self-manage their Shadowsocks tunnel
 
 ## Installation
 
+执行以下指令
+
 ```
-$ sudo apt install software-properties-common python-software-properties
-$ sudo add-apt-repository universe
-$ sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev
-$ sudo apt-get update
-$ sudo apt-get install git supervisor nginx shadowsocks-libev virtualenv python3-dev build-essential 
-$ git clone https://github.com/sam0737/niceboat niceboat
-$ cd niceboat
-$ virtualenv -p python3 pyenv
-$ source pyenv/bin/activate
-$ pip install -r pyenv.txt
-$ sudo loginctl enable-linger `whoami`
-$ mkdir ~/.config
-$ cp -a systemd ~/.config
-$ sed -i "s|/ROOT_DIR/niceboat|`pwd`|g" `find ~/.config -type f` # To replace the path
-$ systemctl --user daemon-reload
-$ systemctl --user enable niceboat-supervisord.service
-$ systemctl --user enable niceboat-web.service
-$ cp config.sample.py config.py # And modify accordingly
-$ cp user.sample.list user.list # And modify accordingly
-$ systemctl --user start niceboat-supervisord.service
-$ systemctl --user start niceboat-web.service
+# Install system packages
+sudo apt install software-properties-common python-software-properties
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev
+sudo apt-get update
+sudo apt-get install git supervisor nginx shadowsocks-libev virtualenv python3-dev build-essential 
+curl -Ls https://install.direct/go.sh | sudo bash
+
+# Install and configure niceboat
+git clone https://github.com/sam0737/niceboat niceboat
+cd niceboat
+virtualenv -p python3 pyenv
+source pyenv/bin/activate
+pip install -r pyenv.txt
+sudo loginctl enable-linger `whoami`
+mkdir ~/.config
+cp -a systemd ~/.config
+sed -i "s|/ROOT_DIR/niceboat|`pwd`|g" `find ~/.config -type f` # To replace the path
+systemctl --user daemon-reload
+systemctl --user enable niceboat-supervisord.service
+systemctl --user enable niceboat-web.service
+cp config.sample.py config.py # And modify accordingly
+cp user.sample.list user.list # And modify accordingly
+systemctl --user start niceboat-supervisord.service
+systemctl --user start niceboat-web.service
 ```
 
 ## Nginx Configuration
 
 Assume you are using letsencrypt
-
 
 ```
 $ sudo add-apt-repository ppa:certbot/certbot
