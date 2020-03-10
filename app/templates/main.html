@@ -3,68 +3,76 @@
 
 {% block content %}
 <div class="container">
+  <h1>穿越方案选择</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <p>首推V2Ray，它稳定性和速度较快。配置可能稍为繁琐一点点。Shadowsocks会相对慢和易断线。</p>
+      <p>Niceboat两者都支持，配置参数(密码)在下面列出。</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h1>V2Ray隧道</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <p>如果已经安装V2Ray软件，请看<a href="#param_v2ray">配置参数</a>。</p>
+    </div>
+  </div>
+  
+  <h2>安装方法</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>PC</h3>
+      <ul>
+        <li><a href="/files/V2RayW-1.0.0-beta2.zip">下载V2RayW图形界面</a>、在桌面解压。</li>
+        <li>在解压后的文件夹中，建一个叫<em>v2ray-core</em>的目录</li>
+        <li><a href="/files/v2ray-4.22.1-windows-64.zip">下载V2Ray Core</a>、解压到上面的<em>v2ray-core</em>文件夹中。</li>
+        <li>双击V2RayW.exe运行，然后它会出现在小时钟边上的小图示里</li>
+        <li>右点小图示 → 配置(Configure...)，VMess Servers点新增(Add)，右面的部份按连线参数填写，最后点保存(Save)。</li>
+        <li>右点小图示 → 全局模式(Global Mode)。<br>建议不要用PAC模式(PAC Mode)。</li>
+        <li>右点小图示 → 路由方式(V2Ray's Routing Rule) → bypass cn &amp; private</li>
+        <p>另，如果希望所有网站都走隧道，包括国内的，那么右点小图示 → 路由方式(V2Ray's Routing Rule) → all to direct</p>
+      </ul>
+    </div>
+    <div class="col-md-6">
+       <h3>其他系统</h3>
+       <p>Android, iOS, MacOS, Linux也有相应的软件，参阅官方文件 <a href="https://www.v2ray.com/awesome/tools.html">神一样的工具们</a>。配置方法待补充。</p>
+    </div>
+  </div>
+
+  <div id="param_v2ray">
+  <h2>连线参数 (VMess)</h2>
+  <p>你的专属隧道是创建于: {{ ss_links.v2ray.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
+  <div class="row">
+    <div class="col-md-12">
+    <pre>主机 Host: {{ ss_links.v2ray.host }}
+端口 Port: {{ ss_links.v2ray.port }}
+(或称 - 地址 Address: {{ ss_links.v2ray.host }}:{{ ss_links.v2ray.port }})
+
+User ID: {{ ss_links.v2ray.passphrase }}
+Alter ID: 64
+Level: 1
+Security: Auto
+Network: tcp
+{{ ss_links.ssphrase }}</pre>
+    </div>
+  </div>
+  </div>
+
+  <hr>
+
   <h1>Shadowsocks隧道</h1>
   <div class="row">
     <div class="col-md-12">
-      <p>没有安装Shadowsocks的话请先<a href="#install">参照安装方法</a>。</p>
+      <p>如果已经安装Shadowsocks软件，请看<a href="#param_gcm">配置参数</a>。</p>
     </div>
   </div>
 
-  <div id="param_gcm" class="hidden">
-  <h1>连线参数 (GCM)</h1>
-  <p>你的专属隧道是创建于: {{ ss_links.aes_256_gcm.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
-  <p>请选用以下其中一种方法设定你的Shadowsocks软件 (三种是一样的)</p>
-  <div class="row">
-    <div class="col-md-4">
-      <h2>连接</h2>
-      <p>只限手机浏览器能直接点。PC和Mac OS一般要先复制再在软件中某处贴上。</p>
-      <div style="word-wrap: break-word;"><a href="{{ ss_links.aes_256_gcm.url }}">{{ ss_links.aes_256_gcm.url }}</a></div>
-    </div>
-    <div class="col-md-4">
-      <h2>QR Code</h2>
-      <p>请用Shadowsocks程序去扫描。<br><strong>不要用</strong>支付宝或微信去扫描。</p>
-      <div id="qrcode_gcm" style="width: 128px; height: 128px; padding: 10px;"></div>
-    </div>
-    <div class="col-md-4">
-    <h2>手工输入</h2>
-    <pre>主机 Host: {{ ss_links.aes_256_gcm.host }}
-端口 Port: {{ ss_links.aes_256_gcm.port }}
-密码 Passphrase: {{ ss_links.aes_256_gcm.passphrase }}
-加密算法 Encryption Algorithm: {{ ss_links.aes_256_gcm.encryption }}</pre>
-    </div>
-  </div>
-  </div>
-
-  <div id="param_cfb" class="hidden">
-  <p><a id="show_gcm" href="javascript:$('#param_gcm').removeClass('hidden')">显示GCM参数</a> - 目前为止iOS未有App支持AES-256-GCM加密制式，所以默认隐藏。GCM(AEAD)制式有更显着的隐身功效。</p>
-  <h1>连线参数 (CFB)</h1>
-  <p>你的专属隧道是创建于: {{ ss_links.aes_256_cfb.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
-  <p>请选用以下其中一种方法设定你的Shadowsocks软件 (三种是一样的)</p>
-  <div class="row">
-    <div class="col-md-4">
-      <h2>连接</h2>
-      <p>只限手机浏览器能直接点。PC和Mac OS一般要先复制再在软件中某处贴上。</p>
-      <div style="word-wrap: break-word;"><a href="{{ ss_links.aes_256_cfb.url }}">{{ ss_links.aes_256_cfb.url }}</a></div>
-    </div>
-    <div class="col-md-4">
-      <h2>QR Code</h2>
-      <p>请用Shadowsocks程序去扫描。<br><strong>不要用</strong>支付宝或微信去扫描。</p>
-      <div id="qrcode_cfb" style="width: 128px; height: 128px; padding: 10px;"></div>
-    </div>
-    <div class="col-md-4">
-    <h2>手工输入</h2>
-    <pre>主机 Host: {{ ss_links.aes_256_cfb.host }}
-端口 Port: {{ ss_links.aes_256_cfb.port }}
-密码 Passphrase: {{ ss_links.aes_256_cfb.passphrase }}
-加密算法 Encryption Algorithm: {{ ss_links.aes_256_cfb.encryption }}</pre>
-    </div>
-  </div>
-  </div>
-
-  <h1 id="install">安装方法</h1>
+  <h2>安装方法</h2>
   <div class="row">
     <div class="col-md-6">
-      <h2>PC</h2>
+      <h3>PC</h3>
       <ul>
         <li><a href="/files/Shadowsocks-4.0.4.zip">下载Zip</a>、解压、双击运行</li>
         <li>运行后可能出现在小时钟边上的小图示里</li>
@@ -73,7 +81,7 @@
       </ul>
     </div>
     <div class="col-md-6">
-      <h2>Mac OS X</h2>
+      <h3>Mac OS X</h3>
       <ul>
         <li><a href="/files/ShadowsocksX-NG.1.5.1.zip">下载Zip</a>、解压、双击运行</li>
         <li>楼主尚验证使用方法，请暂时参照PC的。</li>
@@ -82,7 +90,7 @@
   </div>
   <div class="row">
     <div class="col-md-6">
-      <h2>Android</h2>
+      <h3>Android</h3>
       <ul>
         <li><a href="/files/shadowsocks-nightly-4.1.8.apk">直接下载和安装APK</a>，或经<a href="https://play.google.com/store/apps/details?id=com.github.shadowsocks">Shadowsocks (Play Store)</a>安装</li>
         <li>安装后，回到此页点开上面的ss://连接，同意用刚装的软件打开，即完成配置。</li>
@@ -90,7 +98,7 @@
       </ul>
     </div>
     <div class="col-md-6">
-      <h2>iOS</h2>
+      <h3>iOS</h3>
       <ul><li>以下App三选一安装一个
         <ul>
           <li><a href="https://itunes.apple.com/cn/app/wingy-proxy-for-ss-http-s/id1178584911?l=zh&mt=8">Wingy (for 10, App Store)</a></li>
@@ -102,7 +110,7 @@
       </ul>
     </div>
     <div class="col-md-6">
-      <h2>Linux (Ubuntu)</h2>
+      <h3>Linux (Ubuntu)</h3>
       <pre>sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev
 sudo apt-get update
 sudo apt install shadowsocks-libev
@@ -114,6 +122,33 @@ man ss-local</pre>
       </ul>
     </div>
   </div>
+
+  <div id="param_gcm">
+  <h2>连线参数 (GCM)</h2>
+  <p>你的专属隧道是创建于: {{ ss_links.aes_256_gcm.time | strftime }}。有效期约{{ Config.exp_day }}天。</p>
+  <p>请选用以下其中一种方法设定你的Shadowsocks软件 (三种是一样的)</p>
+  <div class="row">
+    <div class="col-md-4">
+      <h3>连接</h3>
+      <p>只限手机浏览器能直接点。PC和Mac OS一般要先复制再在软件中某处贴上。</p>
+      <div style="word-wrap: break-word;"><a href="{{ ss_links.aes_256_gcm.url }}">{{ ss_links.aes_256_gcm.url }}</a></div>
+    </div>
+    <div class="col-md-4">
+      <h3>QR Code</h3>
+      <p>请用Shadowsocks程序去扫描。<br><strong>不要用</strong>支付宝或微信去扫描。</p>
+      <div id="qrcode_gcm" style="width: 128px; height: 128px; padding: 10px;"></div>
+    </div>
+    <div class="col-md-4">
+    <h3>手工输入</h3>
+    <pre>主机 Host: {{ ss_links.aes_256_gcm.host }}
+端口 Port: {{ ss_links.aes_256_gcm.port }}
+密码 Passphrase: {{ ss_links.aes_256_gcm.passphrase }}
+加密算法 Encryption Algorithm: {{ ss_links.aes_256_gcm.encryption }}</pre>
+    </div>
+  </div>
+  </div>
+
+  <hr>
 
   <h1>疑难排解</h1>
   <ul>
@@ -135,8 +170,8 @@ man ss-local</pre>
 <script src="js/qrcode.min.js"></script>
 <script>
 new QRCode("qrcode_gcm", {width: 128, height: 128}).makeCode({{ ss_links.aes_256_gcm.url|tojson|safe }});
-new QRCode("qrcode_cfb", {width: 128, height: 128}).makeCode({{ ss_links.aes_256_cfb.url|tojson|safe }});
 
+/*
 $(function() {
     var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     if (iOS) {
@@ -144,6 +179,6 @@ $(function() {
     } else {
         $('#param_gcm').removeClass('hidden');
     }
-});
+});*/
 </script>
 {% endblock %}

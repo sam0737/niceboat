@@ -99,6 +99,11 @@ def index():
 
     return render_template('login.html', auth_failed=auth_failed)
 
+@app.route('/expire')
+def expire():
+    scm.expire()
+    return 'ok'
+
 @app.route('/welcome')
 @login_required
 def main():
