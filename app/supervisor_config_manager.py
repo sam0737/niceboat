@@ -124,7 +124,10 @@ class SupervisorConfigManager(object):
             fullpath_v2ray = self.config_path + '/v2ray/' + filename
             with open(fullpath_v2ray, 'w') as f:
                 f.write('''{
-"inbounds": [{ "port": %s, "protocol": "vmess", "settings": { "clients": [{ "id": "%s", "level": 1, "alterId": 64 }] } }],
+"inbounds": [{ "port": %s, "protocol": "vmess", "settings": { "clients": [
+{ "id": "%s", "level": 1, "alterId": 64 },
+{ "id": "%s", "level": 1, "alterId": 64, "streamSettings": { "network": "mkcp" } } 
+] } }],
 "outbounds": [{ "protocol": "freedom", "settings": {} }, { "protocol": "blackhole", "settings": {}, "tag": "blocked" }],
 "routing": { "strategy": "rules", "settings": { 
     "rules": [ 
@@ -141,7 +144,7 @@ class SupervisorConfigManager(object):
 
             with open(fullpath, 'w') as f:
                 f.write('''[program:%s_%s]
-command=/usr/bin/v2ray/v2ray -config %s
+command=/usr/local/bin/v2ray -config %s
 autorestart=true
                 ''' % (prefix, spec['safe_username'], fullpath_v2ray))
             os.chmod(fullpath, 0o600)

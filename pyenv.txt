@@ -2,14 +2,12 @@ captcha==0.2.4
 click==6.7
 Flask==0.12.2
 Flask-Login==0.4.0
-gevent==1.2.2
-greenlet==0.4.12
+gevent
+greenlet
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
-olefile==0.44
 passlib==1.7.1
-Pillow==4.2.1
 pkg-resources==0.0.0
 six>=1.10.0,<2.0.0
 uWSGI>=2.0.15,<3.0.0
